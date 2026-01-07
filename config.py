@@ -15,3 +15,12 @@ deepseek = init_chat_model(
     api_key=API_KEY,
     temperature=1
 )
+
+
+deepseek_r1 = init_chat_model(
+    "deepseek-ai/DeepSeek-R1",
+    model_provider="openai",
+    base_url=BASE_URL,
+    api_key=API_KEY,
+    temperature=1
+)
