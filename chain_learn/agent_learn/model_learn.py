@@ -17,6 +17,14 @@ from config import deepseek, deepseek_r1
 basic_model = deepseek
 advanced_model = deepseek_r1
 
+"""
+    def wrap_model_call(
+        self,
+        request: ModelRequest,
+        handler: Callable[[ModelRequest], ModelResponse],
+    ) -> ModelCallResult:
+"""
+
 
 # 复杂的中间件，继承AgentMiddleware
 # 简单的使用对应的几个装饰器
