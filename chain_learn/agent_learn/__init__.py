@@ -13,7 +13,8 @@ create_agent 使用 LangGraph 构建基于图的代理运行时。
 4 调用？
 invoke
 stream
-async
+batch
+async?
 5 结构化输出
 structured output
 6 短期记忆
