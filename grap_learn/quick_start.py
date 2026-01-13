@@ -84,6 +84,7 @@ def llm_call(state: dict):
 from langchain.messages import ToolMessage
 
 
+# 这里可以使用预构建 ToolNode
 def tool_node(state: dict):
     """Performs the tool call"""
 
@@ -102,6 +103,7 @@ from langgraph.graph import StateGraph, START, END
 
 
 # Conditional edge function to route to the tool node or end based upon whether the LLM made a tool call
+# 这里可以使用预构件，tool_condition
 def should_continue(state: MessagesState) -> Literal["tool_node", END]:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
 
@@ -150,7 +152,6 @@ messages = agent.invoke({"messages": messages})
 for m in messages["messages"]:
     m.pretty_print()
 
-
 """
 如何构建一个langgraph呢？
 
@@ -159,8 +160,8 @@ for m in messages["messages"]:
 3，定义好各个node，每个node解决什么问题？
     有些node需要处理既定的流程和工作内容，
     有些node需要llm参与，
-    有些node需要调用工具，甚
-    至在后面有些node就是一个agent的调用
+    有些node需要调用工具，
+    甚至在后面有些node就是一个agent的调用
 4，定义好edge，处理node之间数据的流转问题，固定边？条件边？
 5，编译graph，设置checkpointer，store等
 
