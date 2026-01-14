@@ -108,31 +108,44 @@ class HITLResponse(TypedDict):
     例如： AI想要调用write_file，参数是args，你是否允许？['approve', 'edit', 'reject']. 选择不同的操作，返回不同的 HITLResponse就好了。
 """
 
-agent.invoke(
-    # Command(
-    #     resume={"decisions": [
-    #         {"type": "approve"},
-    #         {"type": "approve"}
-    #     ]}  # or "reject"
-    # ),
-    Command(
-        resume=HITLResponse(decisions=[ApproveDecision(type='approve'), ApproveDecision(type='approve')])
-    ),
-    config=config  # Same thread ID to resume the paused conversation
-)
-# 如果没有管中断点，直接继续调用，中断点不会执行。相应的逻辑会跳过
-# result = agent.invoke(
-#     {
-#         "messages": [
-#             {
-#                 "role": "user",
-#                 "content": "执行read_data工具",
-#             }
-#         ]
-#     },
-#     config=config
+# agent.invoke(
+#     # Command(
+#     #     resume={"decisions": [
+#     #         {"type": "approve"},
+#     #         {"type": "approve"}
+#     #     ]}  # or "reject"
+#     # ),
+#     Command(
+#         resume=HITLResponse(decisions=[ApproveDecision(type='approve'), ApproveDecision(type='approve')])
+#     ),
+#     config=config  # Same thread ID to resume the paused conversation
 # )
-# print(result)
+# 如果没有管中断点，直接继续调用，中断点不会执行。相应的逻辑会跳过
+# Ai调用的tool_call，但是由于没有相应中断，直接就接上新invoke的human消息了。
+result = agent.invoke(
+    {
+        "messages": [
+            {
+                "role": "user",
+                "content": "执行read_data工具",
+            }
+        ]
+    },
+    config=config
+)
+print(result)
+result = agent.invoke(
+    {
+        "messages": [
+            {
+                "role": "user",
+                "content": "再次执行read_data工具",
+            }
+        ]
+    },
+    config=config
+)
+print(result)
 """
 详细逻辑可以查看HumanInTheLoopMiddleware的源码，底层就是使用interrupt+middleware(after_model_call)实现的
 
