@@ -24,9 +24,15 @@ def node_b(state: State):
     return {"foo": "b", "bar": ["b"]}
 
 
+def wzw_node(state: State):
+    print(f"wzw_node --> {state}")
+    return None
+
+
 workflow = StateGraph(State)
 workflow.add_node(node_a)
 workflow.add_node(node_b)
+workflow.add_node(wzw_node)
 workflow.add_edge(START, "node_a")
 workflow.add_edge("node_a", "node_b")
 workflow.add_edge("node_b", END)
@@ -47,7 +53,7 @@ for item in all_snapshot:
     print(item)
     print()
 print("----------------------------")
-cfg = all_snapshot[1].config
+cfg = all_snapshot[2].config
 cfg_snapshot = graph.get_state(cfg)
 print(cfg)
 print(cfg_snapshot)
@@ -55,7 +61,7 @@ print("----------------------------")
 # 这里没有发生replay，说明replay的时候，必须input为None
 # 没有replay就是调用了两次，一共8个StateSnapshot
 # resp = graph.invoke({"foo": "wzw", "bar": ["football", "tennis"]}, config=cfg)
-# 最后获取history state，replay有5个StateSnapshot
+# 最后获取history state，replay有4+2个StateSnapshot
 resp = graph.invoke(None, config=cfg)
 print(resp)
 print("----------------------------")
@@ -63,3 +69,15 @@ all_snapshot = list(graph.get_state_history(config))
 for item in all_snapshot:
     print(item)
     print()
+print("----------------------------")
+last_cfg = all_snapshot[0].config
+fork_last_cfg = graph.update_state(config=last_cfg, values={"foo": "wzw"}, as_node="wzw_node")
+print(fork_last_cfg)
+# resp = graph.invoke(None, fork_last_cfg)
+# print(resp)
+print("----------------------------")
+all_snapshot = list(graph.get_state_history(config))
+for item in all_snapshot:
+    print(item)
+    print()
+print("----------------------------")
