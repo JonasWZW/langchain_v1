@@ -1,0 +1,65 @@
+# -*- coding:utf-8 -*-
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import InMemorySaver
+from langchain_core.runnables import RunnableConfig
+from typing import Annotated
+
+from langgraph.types import StateSnapshot
+from typing_extensions import TypedDict
+from operator import add
+
+
+class State(TypedDict):
+    foo: str
+    bar: Annotated[list[str], add]
+
+
+def node_a(state: State):
+    print(f"node a --> {state}")
+    return {"foo": "a", "bar": ["a"]}
+
+
+def node_b(state: State):
+    print(f"node b --> {state}")
+    return {"foo": "b", "bar": ["b"]}
+
+
+workflow = StateGraph(State)
+workflow.add_node(node_a)
+workflow.add_node(node_b)
+workflow.add_edge(START, "node_a")
+workflow.add_edge("node_a", "node_b")
+workflow.add_edge("node_b", END)
+
+checkpointer = InMemorySaver()
+graph = workflow.compile(checkpointer=checkpointer)
+
+config: RunnableConfig = {"configurable": {"thread_id": "1"}}
+resp = graph.invoke({"foo": "", "bar": []}, config)
+print(resp)
+print("----------------------------")
+
+last_snapshot = graph.get_state(config)
+print(last_snapshot)
+print("----------------------------")
+all_snapshot = list(graph.get_state_history(config))
+for item in all_snapshot:
+    print(item)
+    print()
+print("----------------------------")
+cfg = all_snapshot[1].config
+cfg_snapshot = graph.get_state(cfg)
+print(cfg)
+print(cfg_snapshot)
+print("----------------------------")
+# 这里没有发生replay，说明replay的时候，必须input为None
+# 没有replay就是调用了两次，一共8个StateSnapshot
+# resp = graph.invoke({"foo": "wzw", "bar": ["football", "tennis"]}, config=cfg)
+# 最后获取history state，replay有5个StateSnapshot
+resp = graph.invoke(None, config=cfg)
+print(resp)
+print("----------------------------")
+all_snapshot = list(graph.get_state_history(config))
+for item in all_snapshot:
+    print(item)
+    print()
