@@ -70,14 +70,17 @@ for item in all_snapshot:
     print(item)
     print()
 print("----------------------------")
-last_cfg = all_snapshot[0].config
-fork_last_cfg = graph.update_state(config=last_cfg, values={"foo": "wzw"}, as_node="wzw_node")
+last_cfg = all_snapshot[4].config
+fork_last_cfg = graph.update_state(config=last_cfg, values={"foo": "wzw", "bar": ["wzw"]})
+# todo fork_last_cfg的parent_config checkpoint_id指向 last_cfg的checkpoint_id
+print(last_cfg)
 print(fork_last_cfg)
-# resp = graph.invoke(None, fork_last_cfg)
-# print(resp)
+resp = graph.invoke(None, fork_last_cfg)
+print(resp)
 print("----------------------------")
 all_snapshot = list(graph.get_state_history(config))
 for item in all_snapshot:
     print(item)
     print()
 print("----------------------------")
+# todo replay的时候，是从checkpoint id和parent_config一样的节点开始。update_state是就是和checkpoint id相等的节点开始。
