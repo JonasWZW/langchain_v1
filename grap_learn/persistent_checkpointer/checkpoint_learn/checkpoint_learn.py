@@ -52,6 +52,7 @@ all_snapshot = list(graph.get_state_history(config))
 for item in all_snapshot:
     print(item)
     print()
+print(f"----------第一次invoke--{len(all_snapshot)}----------------")
 print("----------------------------")
 cfg = all_snapshot[2].config
 cfg_snapshot = graph.get_state(cfg)
@@ -69,6 +70,7 @@ all_snapshot = list(graph.get_state_history(config))
 for item in all_snapshot:
     print(item)
     print()
+print(f"----------获取历史state[2] replay--{len(all_snapshot)}----------------")
 print("----------------------------")
 last_cfg = all_snapshot[4].config
 fork_last_cfg = graph.update_state(config=last_cfg, values={"foo": "wzw", "bar": ["wzw"]})
@@ -82,5 +84,8 @@ all_snapshot = list(graph.get_state_history(config))
 for item in all_snapshot:
     print(item)
     print()
+print(f"----------获取历史state[4] update_state--{len(all_snapshot)}----------------")
 print("----------------------------")
 # todo replay的时候，是从checkpoint id和parent_config一样的节点开始。update_state是就是和checkpoint id相等的节点开始。
+#      start---> a ---> b ---> end
+#  c0        c1     c2     c3
